@@ -1,0 +1,61 @@
+@font-face{font-family:"Inter";font-weight:400;src:url(fonts/inter-400.woff2) format("woff2")}
+@font-face{font-family:"Inter";font-weight:500;src:url(fonts/inter-500.woff2) format("woff2")}
+@font-face{font-family:"Inter";font-weight:600;src:url(fonts/inter-600.woff2) format("woff2")}
+:root{
+  --white:#ffffff; --neutral-50:#f9fafb; --neutral-100:#f3f4f6; --neutral-200:#e5e7eb; --neutral-400:#9ca3af;
+  --neutral-600:#4b5563; --neutral-900:#111827; --secondary-50:#eff6ff; --secondary-100:#dbeafe; --secondary-200:#bfdbfe;
+  --secondary-500:#3b82f6; --green:#34c759; --red:#ff0000; --switch-off:#e9e9ea;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--white);font-family:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+p{margin:0}
+.root{position:relative;width:380px;display:flex;flex-direction:column;gap:16px;padding:17px;background:var(--white);   /* 1px border + 17px = Figma's 18px inset */
+  border:1px solid var(--neutral-200);border-radius:16px}
+
+.head{display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:10px}
+.badge{display:flex;align-items:center;justify-content:center;padding:6px 8px;border-radius:6px;background:var(--red)}
+.badge svg{display:block;width:12px;height:12px}
+.titles{display:flex;flex-direction:column;gap:2px;white-space:nowrap}
+.title{font-size:14px;line-height:18px;font-weight:600;color:var(--neutral-900)}
+.subtitle{font-size:11px;line-height:14px;font-weight:400;color:var(--neutral-400)}
+
+.switch{position:relative;flex:none;width:64px;height:28px;padding:0;border:0;border-radius:100px;background:var(--switch-off);cursor:pointer;transition:background-color .2s}
+.switch[aria-checked="true"]{background:var(--green)}
+.knob{position:absolute;top:2px;left:2px;width:38px;height:24px;border-radius:100px;background:var(--white);
+  box-shadow:0 2px 6px rgba(0,0,0,.12);transition:transform .2s;pointer-events:none}
+.switch[aria-checked="true"] .knob{transform:translateX(22px)}
+.switch:focus-visible{outline:2px solid var(--secondary-500);outline-offset:2px}
+
+.line{height:1px;margin:-0.5px 0;width:100%;background:var(--neutral-100);flex:none}
+
+.section{display:flex;flex-direction:column;gap:16px;transition:opacity .2s}
+.section[aria-disabled="true"]{opacity:.6}
+.section[aria-disabled="true"] .styles{pointer-events:none}
+.label{display:flex;align-items:center;justify-content:space-between;font-size:11px;line-height:16px;white-space:nowrap}
+.label-title{font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--neutral-600)}
+.label-state{font-weight:500;color:var(--green)}
+.section[aria-disabled="true"] .label-state{color:var(--neutral-400)}
+
+.styles{display:flex;flex-direction:column;gap:8px}
+.row{position:relative;display:flex;align-items:center;gap:12px;padding:11px;border-radius:10px;   /* 1px border + 11px = Figma's 12px inset */
+  background:var(--neutral-50);border:1px solid var(--neutral-100);transition:background-color .15s,border-color .15s}
+.row:hover{background:var(--neutral-100)}
+.row:has(.select[aria-checked="true"]){background:var(--secondary-50);border-color:var(--secondary-200)}
+.select{flex:1;min-width:0;display:flex;align-items:center;gap:12px;margin:-11px 0 -11px -11px;padding:11px 0 11px 11px;border:0;background:transparent;
+  font:inherit;text-align:left;cursor:pointer;border-radius:10px}
+.visual{display:flex;align-items:center;justify-content:center;padding:8px;border-radius:8px;background:var(--neutral-100);color:var(--neutral-400)}
+.visual svg{display:block;width:16px;height:16px}
+.select[aria-checked="true"] .visual{background:var(--secondary-100);color:var(--secondary-500)}
+.name{font-size:13px;line-height:16px;font-weight:500;color:var(--neutral-900);white-space:nowrap}
+.select[aria-checked="true"] .name{font-weight:600}
+.preview{flex:none;display:flex;align-items:center;justify-content:center;width:24px;height:24px;padding:0;border:0;border-radius:6px;
+  background:transparent;color:var(--neutral-900);cursor:pointer}
+.preview svg{display:block;width:16px;height:16px}
+.preview:hover{background:rgba(17,24,39,.06)}
+.select:focus-visible,.preview:focus-visible{outline:2px solid var(--secondary-500);outline-offset:2px}
+
+.footer{display:flex;align-items:center;justify-content:space-between;padding-top:4px;font-size:10px;font-weight:500;color:var(--neutral-400);white-space:nowrap}
+.footer a{color:inherit;text-decoration:underline;text-underline-position:from-font;cursor:pointer}
+.footer a:hover{color:var(--neutral-600)}
