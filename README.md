@@ -22,7 +22,7 @@ The extension isn't on the Chrome Web Store, so you install it in "unpacked" (de
 
 1. At the top of this repository page, click the green **Code** button.
 2. Click **Download ZIP**.
-3. Unzip the file. You'll get a folder called `dramatic-pause-main`.
+3. Unzip the file. You'll get a folder called `dramaticPause-main`.
 4. Move that folder somewhere permanent, like your Documents folder.
 
 > **Keep the folder where it is.** The browser loads the extension straight from this folder. If you delete or move it later, the extension stops working.
@@ -30,7 +30,7 @@ The extension isn't on the Chrome Web Store, so you install it in "unpacked" (de
 **Option B: Clone with Git**
 
 ```bash
-git clone https://github.com/hados1109/dramatic-pause.git
+git clone https://github.com/hados1109/dramaticPause.git
 ```
 
 ### Step 2: Load it into your browser
