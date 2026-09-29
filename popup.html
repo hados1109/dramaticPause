@@ -9,9 +9,11 @@
 <main class="root" id="root" data-paint="box">
   <header class="head">
     <div class="brand">
-      <span class="badge" data-paint="box">
-        <svg data-paint="icon" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/></svg>
-      </span>
+      <svg class="logo" data-paint="icon" width="40" height="40" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M2.24451 9.94111C2.37304 7.96233 3.96395 6.41157 5.94447 6.31345C8.81239 6.17136 12.9115 6 16 6C19.0885 6 23.1876 6.17136 26.0555 6.31345C28.0361 6.41157 29.627 7.96233 29.7555 9.94111C29.8786 11.8369 30 14.1697 30 16C30 17.8303 29.8786 20.1631 29.7555 22.0589C29.627 24.0377 28.0361 25.5884 26.0555 25.6866C23.1876 25.8286 19.0885 26 16 26C12.9115 26 8.81239 25.8286 5.94447 25.6866C3.96395 25.5884 2.37304 24.0377 2.24451 22.0589C2.12136 20.1631 2 17.8303 2 16C2 14.1697 2.12136 11.8369 2.24451 9.94111Z" fill="#FC0D1B"/>
+      <path d="M14.5 20.9L12 20.7618V11.238L14.5 11.1V20.9Z" fill="white"/>
+      <path d="M17.5 20.9L20 20.7618V11.238L17.5 11.1V20.9Z" fill="white"/>
+      </svg>
       <div class="titles">
         <p class="title" id="title" data-paint="text">Dramatic Pause</p>
         <p class="subtitle" data-paint="text">for YouTube™</p>
@@ -20,37 +22,29 @@
     <button type="button" role="switch" id="enabled" class="switch" aria-checked="true" aria-labelledby="title" data-paint="box"><span class="knob" data-paint="box"></span></button>
   </header>
 
-  <div class="line" data-paint="box"></div>
-
-  <div class="section" id="section">
-    <div class="label">
-      <p class="label-title" data-paint="text">Pause Style</p>
-      <p class="label-state" id="state" data-paint="text">Active</p>
-    </div>
-    <div class="styles" id="presets" role="radiogroup" aria-label="Pause Style">
+  <div class="styles" id="presets" role="radiogroup" aria-label="Pause Style">
       <div class="row" data-paint="box">
         <button type="button" role="radio" class="select" data-preset="cinematic" aria-checked="false">
           <span class="visual" data-paint="box">
-            <svg data-paint="icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>
+            <svg data-paint="icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M142.15-154.02q-27.6 0-47.86-20.27-20.27-20.26-20.27-47.86v-515.7q0-27.7 20.27-48.03 20.26-20.34 47.86-20.34h515.7q27.7 0 48.03 20.34 20.34 20.33 20.34 48.03V-525l130.41-130.41q7.72-7.96 18.65-3.85 10.94 4.11 10.94 15.28v327.96q0 11.17-10.94 15.28-10.93 4.11-18.65-3.85L726.22-435v212.85q0 27.6-20.34 47.86-20.33 20.27-48.03 20.27h-515.7Zm0-68.13h515.7v-515.7h-515.7v515.7Zm0 0v-515.7 515.7Z"/></svg>
           </span>
           <span class="name" data-paint="text">Cinematic</span>
         </button>
         <button type="button" class="preview" data-preview="cinematic" aria-label="Preview Cinematic">
-          <svg data-paint="icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
+          <svg data-paint="icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M600.5-379.62q49.5-49.62 49.5-120.5T600.38-620.5Q550.76-670 479.88-670T359.5-620.38Q310-570.76 310-499.88t49.62 120.38q49.62 49.5 120.5 49.5t120.38-49.62Zm-197.25-43.85q-31.42-31.65-31.42-76.75 0-45.11 31.64-76.53 31.65-31.42 76.75-31.42 45.11 0 76.53 31.64 31.42 31.65 31.42 76.75 0 45.11-31.64 76.53-31.65 31.42-76.75 31.42-45.11 0-76.53-31.64ZM232.24-270.78Q120.68-347.06 53.41-466.17q-4.48-8.04-6.71-16.57-2.24-8.53-2.24-17.32 0-8.79 2.24-17.26 2.23-8.48 6.71-16.51 67.27-119.11 178.83-195.39Q343.8-805.5 480-805.5t247.76 76.28q111.56 76.28 178.83 195.39 4.48 8.04 6.71 16.57 2.24 8.53 2.24 17.32 0 8.79-2.24 17.26-2.23 8.48-6.71 16.51-67.27 119.11-178.83 195.39Q616.2-194.5 480-194.5t-247.76-76.28ZM480-500Zm222.26 174.5Q803.52-391 856.52-500q-53-109-154.09-174.5T480.17-740Q359-740 257.74-674.5T102.48-500q54 109 155.09 174.5T479.83-260q121.17 0 222.43-65.5Z"/></svg>
         </button>
       </div>
       <div class="row" data-paint="box">
         <button type="button" role="radio" class="select" data-preset="anime" aria-checked="false">
           <span class="visual" data-paint="box">
-            <svg data-paint="icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg>
+            <svg data-paint="icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="m395.63-168.83 275.65-331.65H493.2l35.28-280.74-250.13 361.46h152.8l-35.52 250.93ZM354.74-353.3h-138.7q-20.63 0-30.32-18.16-9.7-18.15 2.74-35.3l347.08-500.91q8.48-11.72 21.2-15.84 12.72-4.12 25.43 1 12.72 5.12 20.2 16.96 7.48 11.83 5.48 25.55l-39.48 313.07H740.3q21.63 0 30.71 19.39 9.08 19.39-4.36 36.3L386.33-54.52q-8.48 10.72-21.7 13.84-13.22 3.12-25.05-2.24-11.84-5.36-18.58-16.96-6.74-11.6-4.74-25.55l38.48-267.87ZM474.2-474.28Z"/></svg>
           </span>
           <span class="name" data-paint="text">Anime speedlines</span>
         </button>
         <button type="button" class="preview" data-preview="anime" aria-label="Preview Anime speedlines">
-          <svg data-paint="icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
+          <svg data-paint="icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M600.5-379.62q49.5-49.62 49.5-120.5T600.38-620.5Q550.76-670 479.88-670T359.5-620.38Q310-570.76 310-499.88t49.62 120.38q49.62 49.5 120.5 49.5t120.38-49.62Zm-197.25-43.85q-31.42-31.65-31.42-76.75 0-45.11 31.64-76.53 31.65-31.42 76.75-31.42 45.11 0 76.53 31.64 31.42 31.65 31.42 76.75 0 45.11-31.64 76.53-31.65 31.42-76.75 31.42-45.11 0-76.53-31.64ZM232.24-270.78Q120.68-347.06 53.41-466.17q-4.48-8.04-6.71-16.57-2.24-8.53-2.24-17.32 0-8.79 2.24-17.26 2.23-8.48 6.71-16.51 67.27-119.11 178.83-195.39Q343.8-805.5 480-805.5t247.76 76.28q111.56 76.28 178.83 195.39 4.48 8.04 6.71 16.57 2.24 8.53 2.24 17.32 0 8.79-2.24 17.26-2.23 8.48-6.71 16.51-67.27 119.11-178.83 195.39Q616.2-194.5 480-194.5t-247.76-76.28ZM480-500Zm222.26 174.5Q803.52-391 856.52-500q-53-109-154.09-174.5T480.17-740Q359-740 257.74-674.5T102.48-500q54 109 155.09 174.5T479.83-260q121.17 0 222.43-65.5Z"/></svg>
         </button>
       </div>
-    </div>
   </div>
 
   <div class="line" data-paint="box"></div>

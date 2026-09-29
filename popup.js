@@ -1,16 +1,13 @@
 const DEFAULTS = { enabled: true, preset: 'cinematic' };
 const enabledEl = document.getElementById('enabled');
 const presetsEl = document.getElementById('presets');
-const sectionEl = document.getElementById('section');
-const stateEl = document.getElementById('state');
 try { document.getElementById('version').textContent = 'v' + chrome.runtime.getManifest().version; } catch (e) {}
 const options = [...document.querySelectorAll('[data-preset]')];
 let state = { ...DEFAULTS };
 
 function render(){
   enabledEl.setAttribute('aria-checked', String(state.enabled));
-  sectionEl.setAttribute('aria-disabled', String(!state.enabled));
-  stateEl.textContent = state.enabled ? 'Active' : 'Off';
+  presetsEl.setAttribute('aria-disabled', String(!state.enabled));
   options.forEach(o => {
     const on = o.dataset.preset === state.preset;
     o.setAttribute('aria-checked', String(on));
