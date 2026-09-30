@@ -1,0 +1,2 @@
+/* The effect layer sits right over YouTube's picture, under its controls and captions, and never takes clicks. */
+.dp-overlay{position:absolute;left:0;top:0;display:none;pointer-events:none;margin:0;padding:0;border:0}

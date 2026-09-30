@@ -1,6 +1,10 @@
-/* Dramatic Pause for YouTube — preview of the effect inside the popup */
+/* Dramatic Pause for YouTube — content script.
+   Pausing a video plays a warp effect over YouTube's own picture (Cinematic ripple or Anime freeze).
+   The effect layer only exists while the effect is on screen; the rest of the time YouTube is untouched. */
 (() => {
 'use strict';
+if (window.__dramaticPauseLoaded) return;
+window.__dramaticPauseLoaded = true;
 
 /* ───────────────────────── Config ───────────────────────── */
 const BASE = {
@@ -20,7 +24,7 @@ const BASE = {
   echoes: 0, echoSpacing: 80, echoFalloff: 0.6
 };
 const PRESETS = {
-  /* Time stop: Vinyas's tuned config. A wide soft ring with a colour fringe, three fading echo rings,
+  /* Cinematic. A wide soft ring with a colour fringe, three fading echo rings,
      and a smooth aftershock; the page goes briefly grey inside the wave, fading as it reaches the edges. */
   timestop: { timeScale: 1, maxRipples: 6, duration: 4, ease: 'outCubic', fadeIn: 200, reach: 'corner', fixedRadius: 600,
             loudWidth: 24, loudWarp: 3, loudProfile: 'gaussian', loudFade: 1.3, loudGlow: 0, loudGlowColor: '#ffffff',
@@ -32,7 +36,7 @@ const PRESETS = {
             frozenStyle: 'none', frozenStrength: 0, frozenTint: '#9cb3d4', frozenDim: 0, frozenVignette: 0,
             halftone: 0, halftoneSize: 6, haltAt: 0.6, haltStrength: 0.7, resumeEase: 'outCubic', echoes: 3,
             echoSpacing: 80, echoFalloff: 0.4 },
-  /* Time stop, comic panel style (Vinyas's tuned config): black-and-white negative flash with an inked edge
+  /* Anime: black-and-white negative flash with an inked edge
      that snaps straight back, then the frozen page turns into a printed halftone until the next click. */
   timestopComic: { timeScale: 1, maxRipples: 6, duration: 0.7, ease: 'outExpo', fadeIn: 0, reach: 'corner', fixedRadius: 600,
             loudWidth: 3, loudWarp: 6, loudProfile: 'sharp', loudFade: 0.3, loudGlow: 1, loudGlowColor: '#111111',
@@ -65,6 +69,8 @@ const EASE = {
 const freezeOn = c => c.freeze !== 'none' || c.path === 'halt';
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const PRESET_KEYS = { cinematic: 'timestop', anime: 'timestopComic' };
+const SETTINGS_DEFAULTS = { enabled: true, preset: 'cinematic' };
+let settings = { ...SETTINGS_DEFAULTS };
 let baseCfg = { ...BASE, ...PRESETS.timestop };
 let cfg = baseCfg;
 
@@ -346,7 +352,7 @@ function waveDone(r){
 }
 function waveAt(r){
   const age = clock - r.t0;
-  const fin = cfg.fadeIn > 0 ? 1 - Math.pow(1 - clamp(age / (cfg.fadeIn / 1000), 0, 1), 3) : 1;
+  const fin = cfg.fadeIn > 0 ? 1 - Math.pow(1 - clamp(age / (cfg.fadeIn / 1000), 0, 1), 3) : 1;   // fast rise: visible from the first frame
   const ease = EASE[cfg.ease] || EASE.outQuad, easeC = EASE[cfg.collapseEase] || EASE.inCubic;
   const easeR = EASE[cfg.resumeEase] || EASE.outCubic;
   const noInside = cfg.insideStyle === 'none';
@@ -492,111 +498,261 @@ const Sound = (() => {
   return { slowing, quickening, cancel };
 })();
 
-/* ───────────────────────── Popup preview: play the effect over the popup itself ───────────────────────── */
-const REF_W = 720;
+/* ───────────────────────── YouTube integration ───────────────────────── */
+const REF_W = 720;   // presets are tuned for a 720 px wide picture and scale with the player
 const SCALED = ['loudWidth', 'loudWarp', 'faintWidth', 'faintGap', 'faintWarp', 'echoSpacing', 'insideFeather', 'shake', 'fixedRadius'];
+const CALM = matchMedia('(prefers-reduced-motion: reduce)');
 function scaleCfg(b){
   const k = clamp(W / REF_W, 0.3, 3), c = { ...b };
   SCALED.forEach(key => { c[key] = b[key] * k; });
   c.loudWidth = Math.max(1, c.loudWidth);
   c.insideFeather = Math.max(0.5, c.insideFeather);
   c.halftoneSize = clamp(b.halftoneSize * k, 3, 10);
+  if (CALM.matches) c.shake = 0;
   return c;
 }
 function updateStatus(){}
 
-const root = document.getElementById('root');
-const snap = document.createElement('canvas');
-const sc = snap.getContext('2d');
-Object.assign(stage.style, { position: 'absolute', left: '0', top: '0', pointerEvents: 'none', display: 'none', zIndex: '10' });
+stage.className = 'dp-overlay';
 stage.setAttribute('aria-hidden', 'true');
-root.appendChild(stage);
-let active = false, glReady = false;
 
+let video = null, playerEl = null, active = false, blocked = false, glReady = false;
+let lastPointer = null, prevW = 0, prevH = 0, navAt = -1e9, warmKey = '';
+let predicted = null;   // an effect started from a click, waiting for YouTube's own (delayed) pause
+let fadeT0 = null;      // clock time a cancelled effect began fading out
+let predictedResume = null;   // Anime: resume wave started from a click, waiting for YouTube's (delayed) play
+
+function show(){ if (!active) { active = true; stage.style.display = 'block'; } }
 function hide(){ active = false; stage.style.display = 'none'; }
-function upload(){
-  gl.bindTexture(gl.TEXTURE_2D, tex);
-  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, snap);
-}
-const opacityOf = el => { let o = 1; for (let n = el; n && n !== document; n = n.parentElement) o *= parseFloat(getComputedStyle(n).opacity) || 0; return o; };
-function iconImage(el, color){
-  const svg = new XMLSerializer().serializeToString(el).replace(/currentColor/g, color);
-  const img = new Image();
-  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
-  return img.decode().then(() => img, () => null);
-}
-/* Paint the popup's current look into a canvas the shader can bend */
-async function snapshot(){
-  const rr = root.getBoundingClientRect();
-  W = Math.round(rr.width); H = Math.round(rr.height);
-  DPR = Math.min(window.devicePixelRatio || 1, 3);
+
+/* Fit the layer to the picture inside YouTube's <video> box (letterboxing excluded) */
+function layout(){
+  if (!video || !gl) return false;
+  const cw = video.offsetWidth, ch = video.offsetHeight;
+  if (!cw || !ch) return false;
+  let w = cw, h = ch;
+  const vw = video.videoWidth, vh = video.videoHeight;
+  if (vw && vh) { const a = vw / vh; if (cw / ch > a) w = ch * a; else h = cw / a; }
+  w = Math.max(1, Math.round(w)); h = Math.max(1, Math.round(h));
+  stage.style.left = `${Math.round(video.offsetLeft + (cw - w) / 2)}px`;
+  stage.style.top = `${Math.round(video.offsetTop + (ch - h) / 2)}px`;
+  stage.style.width = `${w}px`; stage.style.height = `${h}px`;
+  if (prevW && (w !== prevW || h !== prevH)) {          // theater / full screen / mini player mid-effect: keep it anchored
+    const sx = w / prevW, sy = h / prevH;
+    ripples.forEach(q => { q.x *= sx; q.y *= sy; });
+    freezeCenter.x *= sx; freezeCenter.y *= sy;
+  }
+  prevW = w; prevH = h; W = w; H = h;
+  cfg = scaleCfg(baseCfg);
+  const maxTex = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+  DPR = Math.min(window.devicePixelRatio || 1, 2, maxTex / W, maxTex / H, Math.sqrt(4.5e6 / (W * H)));
   DW = Math.round(W * DPR); DH = Math.round(H * DPR);
-  for (const cv of [stage, snap]) { cv.width = DW; cv.height = DH; }
-  const rcs = getComputedStyle(root), bw = parseFloat(rcs.borderTopWidth) || 0;
-  Object.assign(stage.style, { width: `${W}px`, height: `${H}px`, left: `${-bw}px`, top: `${-bw}px`,   // cover the border box exactly
-    borderRadius: rcs.borderTopLeftRadius, overflow: 'hidden', clipPath: `inset(0 round ${rcs.borderTopLeftRadius})` });
-  if (document.fonts) await document.fonts.ready;
-  const els = [root, ...root.querySelectorAll('[data-paint]')];
-  const icons = await Promise.all(els.map(el => el.dataset.paint === 'icon' ? iconImage(el, getComputedStyle(el).color) : null));
-  const c = sc;
-  c.setTransform(DPR, 0, 0, DPR, 0, 0);
-  c.globalAlpha = 1; c.fillStyle = getComputedStyle(root).backgroundColor; c.fillRect(0, 0, W, H);
-  els.forEach((el, i) => {
-    const cs = getComputedStyle(el);
-    if (cs.visibility === 'hidden' || cs.display === 'none') return;
-    const r = el.getBoundingClientRect(), x = r.left - rr.left, y = r.top - rr.top;
-    c.globalAlpha = opacityOf(el);
-    if (el.dataset.paint === 'box') {
-      const bw = cs.borderTopStyle !== 'none' && cs.borderTopColor !== 'rgba(0, 0, 0, 0)' ? parseFloat(cs.borderTopWidth) || 0 : 0;
-      const k = bw / 2, rad = Math.min(parseFloat(cs.borderTopLeftRadius) || 0, r.height / 2);
-      c.beginPath(); c.roundRect(x + k, y + k, r.width - bw, r.height - bw, Math.max(0, rad - k));   // exact fill; borders stroked on their centre line
-      c.fillStyle = cs.backgroundColor; c.fill();
-      if (bw) { c.strokeStyle = cs.borderTopColor; c.lineWidth = bw; c.stroke(); }
-    } else if (el.dataset.paint === 'text') {
-      c.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
-      if ('letterSpacing' in c) c.letterSpacing = cs.letterSpacing === 'normal' ? '0px' : cs.letterSpacing;
-      c.fillStyle = cs.color; c.textBaseline = 'alphabetic';
-      const txt = cs.textTransform === 'uppercase' ? el.textContent.trim().toUpperCase() : el.textContent.trim();
-      const m = c.measureText(txt), asc = m.fontBoundingBoxAscent, desc = m.fontBoundingBoxDescent;
-      const base = asc != null ? y + (r.height - asc - desc) / 2 + asc : y + r.height / 2 + parseFloat(cs.fontSize) * 0.35;   // where CSS puts the baseline
-      c.fillText(txt, x, base);
-      if (cs.textDecorationLine.includes('underline')) { c.fillRect(x, base + Math.max(1, parseFloat(cs.fontSize) * 0.12), m.width, 1); }
-      if ('letterSpacing' in c) c.letterSpacing = '0px';
-    } else if (icons[i]) c.drawImage(icons[i], x, y, r.width, r.height);
-  });
-  c.globalAlpha = 1;
+  if (stage.width !== DW || stage.height !== DH) { stage.width = DW; stage.height = DH; }
+  return true;
 }
 
-function animating(){ return timeState === 'frozen' ? resumeAt !== null : ripples.length > 0; }
+/* Current video frame → GPU. Protected (DRM) or cross-origin video can't be read; then we stay out of the way. */
+function upload(){
+  if (!gl || !video || blocked) return;
+  try {
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, video);
+  } catch (e) {
+    blocked = true; ripples = []; frozenLevel = 0; timeState = 'normal'; hide();
+  }
+}
+
+function animating(){
+  if (timeState === 'frozen') return resumeAt !== null;
+  return ripples.length > 0;
+}
 function frame(now){
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
-  if (!active) { running = false; return; }
+  if (!video || !active) { running = false; return; }
+  if (!video.paused) upload();                           // live frames under a resume wave or a fading ripple
   clock += dt * cfg.timeScale;
-  if (timeState === 'frozen' && resumeAt !== null && clock >= resumeAt) resume(freezeCenter.x, freezeCenter.y);
-  step(); render();
-  if (animating()) requestAnimationFrame(frame); else { running = false; hide(); }
+  step();
+  if (fadeT0 !== null) {
+    const k = 1 - (clock - fadeT0) / 0.15;
+    if (k <= 0) { onReset(); running = false; return; }
+    for (let i = 0; i < slotCount; i++) { A[i * 4 + 3] *= k; B[i * 4] *= k; B[i * 4 + 3] *= k; }
+  }
+  render();
+  if (animating()) requestAnimationFrame(frame);
+  else { running = false; if (timeState !== 'frozen') hide(); }
 }
 function kick(){ if (!running) { running = true; last = performance.now(); requestAnimationFrame(frame); } }
 
-let token = 0;
-window.dpPreview = async (name, fromEl) => {
-  if (!glReady) return;
-  const my = ++token;
-  ripples = []; frozenLevel = 0; timeState = 'normal'; resumeAt = null;
-  baseCfg = { ...BASE, ...PRESETS[PRESET_KEYS[name] || 'timestop'] };
-  if (baseCfg.freeze !== 'none') { baseCfg.freeze = 'timed'; baseCfg.frozenFor = 0.7; }   // no video to press play on: time restarts by itself
-  await snapshot();
-  if (my !== token) return;
-  cfg = scaleCfg(baseCfg);
+/* Where the ripple starts: where you clicked the picture, otherwise the center (keyboard, pause button) */
+function onPointer(e){
+  const t = e.target;
+  const near = sel => !!(t && t.closest && t.closest(sel));
+  lastPointer = { x: e.clientX, y: e.clientY, t: performance.now(),
+    ui: near('.ytp-chrome-bottom, .ytp-chrome-top, .ytp-popup, .ytp-settings-menu, .ytp-ce-element, .ytp-cards-teaser, .ytp-paid-content-overlay, .ytp-pause-overlay, .ytp-autonav-endscreen, .ytp-videowall-still, .annotation, button, a'),
+    scrub: near('.ytp-progress-bar-container, .ytp-scrubber-container, .ytp-chapters-container') };
+}
+function originPoint(){
+  if (lastPointer && !lastPointer.ui && performance.now() - lastPointer.t < 700) {
+    const r = stage.getBoundingClientRect();
+    if (r.width) return { x: clamp(lastPointer.x - r.left, 0, W), y: clamp(lastPointer.y - r.top, 0, H) };
+  }
+  return { x: W / 2, y: H / 2 };
+}
+
+function canStart(){
+  if (!settings.enabled || blocked || !glReady || !video) return false;
+  if (video.ended || video.seeking || video.readyState < 2 || document.hidden) return false;
+  if (playerEl && playerEl.classList.contains('ad-showing')) return false;
+  const now = performance.now();
+  if (now - navAt < 1500) return false;                                           // YouTube pauses while moving to another video
+  if (lastPointer && lastPointer.scrub && now - lastPointer.t < 1000) return false;   // dragging the progress bar
+  return timeState !== 'stopping' && timeState !== 'frozen';
+}
+function startEffect(){
+  if (timeState === 'resuming') { ripples = []; frozenLevel = 0; timeState = 'normal'; resumeAt = null; }
+  fadeT0 = null;
+  if (!layout()) return false;
   upload();
-  const rr = root.getBoundingClientRect(), r = fromEl.getBoundingClientRect();
-  stage.style.display = 'block'; active = true;
-  trigger(r.left + r.width / 2 - rr.left, r.top + r.height / 2 - rr.top);
-  clock += 1 / 60; step(); render(); kick();
-};
+  if (blocked) return false;
+  show();
+  const o = originPoint();
+  trigger(o.x, o.y);
+  clock += 1 / 60;                                     // give the first frame a head start so it is already visible
+  step(); render();                                    // drawn now, in the same task: shows on the very next paint
+  if (!ripples.length && timeState === 'normal') { hide(); return false; }
+  return true;
+}
+function onPause(){
+  if (predicted) {                                     // the click already started it; now the frame is really still
+    clearTimeout(predicted.timer); predicted = null;
+    if (active) { upload(); if (!running) render(); }
+    return;
+  }
+  if (canStart()) startEffect();                       // Space / K, the pause button, anything else
+}
+/* A click on the picture: YouTube waits ~0.2 s (to rule out a double-click) before it pauses,
+   so start the effect on the click itself and let the pause land underneath it. */
+function clickWillPause(){
+  if (!playerEl || playerEl.closest('ytd-miniplayer')) return false;
+  if (playerEl.classList.contains('ytp-player-minimized')) return false;
+  for (const pop of playerEl.querySelectorAll('.ytp-popup')) if (pop.offsetParent !== null) return false;   // a click there closes the menu
+  return true;
+}
+function onClick(e){
+  if (!video) return;
+  if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  if (e.detail >= 2) { cancelPredicted(); cancelPredictedResume(); return; }   // double-click: YouTube goes full screen instead
+  if (!video || !lastPointer || lastPointer.ui || lastPointer.scrub) return;
+  if (video.paused) {                                  // Anime is frozen: start the resume wave on the click too
+    if (!active || timeState !== 'frozen' || !freezeOn(cfg) || !clickWillPause()) return;
+    const o = originPoint();
+    resume(o.x, o.y);
+    clock += 1 / 60; step(); render(); kick();       // first thaw frame drawn now, like the pause
+    predictedResume = { timer: setTimeout(cancelPredictedResume, 500) };
+    return;
+  }
+  if (!clickWillPause() || !canStart()) return;
+  if (startEffect()) predicted = { timer: setTimeout(cancelPredicted, 500) };
+}
+function cancelPredictedResume(){                     // YouTube didn't play after all: back to the frozen frame
+  if (!predictedResume) return;
+  clearTimeout(predictedResume.timer); predictedResume = null;
+  if (!video || !video.paused || !active) return;
+  ripples = ripples.filter(r => r.kind !== 2); frozenLevel = 1; timeState = 'frozen'; resumeAt = null;
+  step(); render();
+}
+function cancelPredicted(){
+  if (!predicted) return;
+  clearTimeout(predicted.timer); predicted = null;
+  if (active && video && !video.paused) { fadeT0 = clock; kick(); }   // YouTube didn't pause after all: fade it away quickly
+}
+function onPlay(){
+  if (predictedResume) { clearTimeout(predictedResume.timer); predictedResume = null; kick(); return; }   // the click already started the resume wave
+  if (!active) return;
+  if (freezeOn(cfg) && (timeState === 'stopping' || timeState === 'frozen')) {
+    if (timeState === 'stopping') { ripples = ripples.filter(r => r.kind !== 1); frozenLevel = 1; timeState = 'frozen'; }
+    const o = originPoint();
+    resume(o.x, o.y);                                    // Anime: time snaps back with the resume wave
+  }
+  kick();                                                // Cinematic: plays normally; a ripple still fading just finishes
+}
+function onSeeked(){ if (active) { upload(); if (!running) render(); } }
+function onReset(){ if (predicted) { clearTimeout(predicted.timer); predicted = null; } if (predictedResume) { clearTimeout(predictedResume.timer); predictedResume = null; } fadeT0 = null; ripples = []; frozenLevel = 0; timeState = 'normal'; resumeAt = null; hide(); blocked = false; prevW = 0; }
+function onMeta(){ if (active && layout()) { upload(); render(); } }
+function warmUp(){
+  if (!gl || !video || blocked || video.readyState < 2) return;
+  const key = `${video.currentSrc}|${video.videoWidth}x${video.videoHeight}`;
+  if (key === warmKey) return;
+  warmKey = key;
+  const idle = window.requestIdleCallback || (cb => setTimeout(cb, 250));
+  idle(() => { if (!video || active || blocked || !layout()) return; upload(); step(); render(); }, { timeout: 1500 });
+}
 
-window.dpRefresh = async () => { if (!active) return; await snapshot(); upload(); if (!running) render(); };   // keep a running preview in step with UI changes
+const ro = new ResizeObserver(() => { if (video && active && layout()) { upload(); render(); } });
+const EVENTS = { pause: onPause, play: onPlay, seeked: onSeeked, emptied: onReset, loadedmetadata: onMeta, loadeddata: warmUp, playing: warmUp, resize: warmUp };
+function attach(v){
+  if (v === video) { if (stage.parentElement !== v.parentElement) v.parentElement.appendChild(stage); return; }
+  detach();
+  video = v; playerEl = v.closest('.html5-video-player');
+  v.parentElement.appendChild(stage);
+  for (const k in EVENTS) v.addEventListener(k, EVENTS[k]);
+  ro.observe(v);
+  if (playerEl) ro.observe(playerEl);
+  blocked = false; prevW = 0; warmKey = '';
+  warmUp();
+}
+function detach(){
+  if (!video) return;
+  for (const k in EVENTS) video.removeEventListener(k, EVENTS[k]);
+  ro.disconnect();
+  onReset();
+  video = null; playerEl = null;
+}
+/* If two copies of the extension are installed, only the newest one runs (the page DOM is shared between them) */
+const OWN_VERSION = (() => { try { return chrome.runtime.getManifest().version; } catch (e) { return '0'; } })();
+const newer = (a, b) => { const x = a.split('.').map(Number), y = b.split('.').map(Number);
+  for (let i = 0; i < Math.max(x.length, y.length); i++) { if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) > (y[i] || 0); } return false; };
+function isOwner(){
+  const root = document.documentElement, owner = root.getAttribute('data-dramatic-pause');
+  if (!owner || !newer(owner, OWN_VERSION)) { root.setAttribute('data-dramatic-pause', OWN_VERSION); return true; }
+  return owner === OWN_VERSION;
+}
+function scan(){
+  if (!isOwner()) { detach(); stage.remove(); return; }
+  const v = document.querySelector('#movie_player video.html5-main-video');
+  if (v) attach(v); else detach();
+}
 
+/* Settings from the toolbar popup */
+function applySettings(s){
+  const before = settings;
+  settings = { ...SETTINGS_DEFAULTS, ...s };
+  baseCfg = { ...BASE, ...PRESETS[PRESET_KEYS[settings.preset] || 'timestop'] };
+  cfg = scaleCfg(baseCfg);
+  if (!settings.enabled || settings.preset !== before.preset) onReset();
+}
+try {
+  chrome.storage.sync.get(SETTINGS_DEFAULTS, applySettings);
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area !== 'sync') return;
+    const next = { ...settings };
+    for (const k in changes) next[k] = changes[k].newValue;
+    applySettings(next);
+  });
+} catch (e) {}
+
+/* Boot */
 try { glReady = initGL(); } catch (e) { glReady = false; }
+hide();
+stage.addEventListener('webglcontextlost', e => { e.preventDefault(); glReady = false; onReset(); });
+stage.addEventListener('webglcontextrestored', () => { try { glReady = initGL(); } catch (e) {} });
+scan();
+setInterval(scan, 1000);
+/* Pointer and click listeners live on the document: YouTube's player element redefines its own addEventListener for the player API */
+const inPlayer = e => !!(playerEl && e.target instanceof Node && playerEl.contains(e.target));
+document.addEventListener('pointerdown', e => { if (inPlayer(e)) onPointer(e); }, true);
+document.addEventListener('click', e => { if (inPlayer(e)) onClick(e); }, true);
+document.addEventListener('yt-navigate-start', () => { navAt = performance.now(); });
+document.addEventListener('yt-navigate-finish', scan);
 })();

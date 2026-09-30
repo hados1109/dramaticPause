@@ -58,7 +58,7 @@ Same steps as Chrome, using `brave://extensions`, `opera://extensions` or `vival
 1. Click the puzzle-piece icon in the toolbar and click the pin next to **Dramatic Pause**.
 2. Open any YouTube video (if a YouTube tab was already open, refresh it).
 3. Pause the video and watch the effect.
-4. Click the toolbar icon to turn the effect on or off, switch between **Cinematic** and **Anime speedlines**, or preview a style with the eye icon.
+4. Click the toolbar icon to turn the effect on or off, switch between **Cinematic** and **Anime**, or preview a style with the eye icon.
 
 ---
 
@@ -90,7 +90,7 @@ Open `chrome://extensions`, click **Remove** on the Dramatic Pause card, then de
 - `content.js` runs on youtube.com. When the main video pauses, it lays a WebGL canvas exactly over YouTube's picture (inside the player, under the controls and captions) and draws the effect from the live video frame. The canvas is hidden whenever no effect is on screen.
 - The canvas lives inside YouTube's player, so it follows theater mode, full screen and the mini player. Ring sizes scale with the picture width (tuned for 720 px), and an effect in progress carries over when the player changes size.
 - Clicks always go to YouTube; the extension only listens. YouTube waits about 0.2 s after a click on the video before it pauses (in case it's a double-click for full screen), so the effect starts on the click itself and the pause lands under it. Anime's resume wave works the same way when you click a frozen video. A double-click cancels either one, since YouTube goes full screen instead.
-- `popup.html` turns the effect on or off, picks the style, and previews each style over the popup itself (eye icon) without selecting it. Settings sync through `chrome.storage.sync`; the popup uses the bundled Inter font.
+- `popup.html` turns the effect on or off, picks the style, and previews each style over the popup itself (eye icon) without selecting it. Settings sync through `chrome.storage.sync`; the popup uses bundled fonts (Bodoni Moda, IBM Plex Mono and a small Dela Gothic One subset, all under the SIL Open Font License).
 
 ## Project structure
 
@@ -103,8 +103,23 @@ Open `chrome://extensions`, click **Remove** on the Dramatic Pause card, then de
 ├── popup.js            Popup settings logic
 ├── popup-effect.js     Style previews inside the popup
 ├── icons/              16, 32, 48 and 128 px icons
-└── fonts/              Bundled Inter (400, 500, 600)
+├── fonts/              Bundled popup fonts (Bodoni Moda, IBM Plex Mono, Dela Gothic One subset)
+└── docs/               Landing page with a live demo (not part of the extension)
 ```
+
+## Website
+
+`docs/` holds the landing page. Its demo runs the real effect on a looping video. To preview it:
+
+```bash
+python3 -m http.server 4321 --directory docs
+```
+
+Then open http://localhost:4321. GitHub Pages can serve the site straight from the `docs/` folder on `main`.
+
+- `docs/content.js` and `docs/content.css` are copies of the extension's files. The demo player is marked up like YouTube's, so the script runs unchanged. Copy them again after changing the effect.
+- The download buttons and the Chrome Web Store link are placeholders until the builds exist. Set them in `LINKS` at the top of `docs/site.js`.
+- Demo footage: "Vibrant Shibuya Crossing in Tokyo" by Nightingale on [Pexels](https://www.pexels.com/video/vibrant-shibuya-crossing-in-tokyo-28783675/), used under the Pexels license.
 
 ## Known limits
 
@@ -115,4 +130,4 @@ Open `chrome://extensions`, click **Remove** on the Dramatic Pause card, then de
 
 ---
 
-Made by [Vinyas Pandey](https://vinyaspandey.webflow.io/). YouTube is a trademark of Google LLC; this project isn't affiliated with or endorsed by Google.
+Made by [Vinyas Pandey](https://vinyas.me/). YouTube is a trademark of Google LLC; this project isn't affiliated with or endorsed by Google.
