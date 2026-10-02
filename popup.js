@@ -29,3 +29,24 @@ presetsEl.addEventListener('keydown', e => {
 });
 document.querySelectorAll('[data-preview]').forEach(b => b.addEventListener('click', () => window.dpPreview && window.dpPreview(b.dataset.preview, b)));
 render();
+
+// Update notice: compare our version with the manifest on GitHub, at most every 6 hours.
+const UPDATE_URL = 'https://raw.githubusercontent.com/hados1109/dramaticPause/main/manifest.json';
+const newer = (a, b) => { const x = a.split('.').map(Number), y = b.split('.').map(Number);
+  for (let i = 0; i < Math.max(x.length, y.length); i++) { if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) > (y[i] || 0); } return false; };
+function showUpdate(latest){
+  const mine = chrome.runtime.getManifest().version;
+  if (!latest || !newer(latest, mine)) return;
+  document.getElementById('update-ver').textContent = 'v' + latest;
+  document.getElementById('update').hidden = false;
+}
+document.getElementById('update-reload').addEventListener('click', () => chrome.runtime.reload());
+try {
+  chrome.storage.local.get({ updateCheck: null }, ({ updateCheck: c }) => {
+    if (c && Date.now() - c.at < 6 * 3600e3) return showUpdate(c.latest);
+    fetch(UPDATE_URL, { cache: 'no-store' }).then(r => r.json()).then(m => {
+      chrome.storage.local.set({ updateCheck: { at: Date.now(), latest: m.version } });
+      showUpdate(m.version);
+    }).catch(() => {});
+  });
+} catch (e) {}

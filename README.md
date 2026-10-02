@@ -14,51 +14,19 @@ Pause a YouTube video and time stops. A cinematic ripple or an anime-style freez
 
 ## Installation
 
-The extension isn't on the Chrome Web Store, so you install it in "unpacked" (developer) mode. It takes about a minute.
+This takes about two minutes.
 
-### Step 1: Get the files
+1. **Download it.** On this page, click the green **Code** button, then **Download ZIP**.
+2. **Unzip it.** Double-click the downloaded file. Move the folder it creates (`dramaticPause-main`) into your **Documents** folder and leave it there. If you delete or move it later, the extension stops working.
+3. **Open your extensions page.** Copy this into your browser's address bar and press Enter:
+   - Chrome: `chrome://extensions`
+   - Edge: `edge://extensions`
+   - Brave, Opera or Vivaldi: `brave://extensions`, `opera://extensions` or `vivaldi://extensions`
+4. **Turn on Developer mode.** Flip the **Developer mode** switch (top-right in Chrome; in Edge it's in the left sidebar).
+5. **Add the extension.** Click **Load unpacked** and choose the `dramaticPause-main` folder from step 2.
+6. **Try it.** Open a YouTube video (refresh the page if it was already open) and pause it.
 
-**Option A: Download ZIP (easiest)**
-
-1. At the top of this repository page, click the green **Code** button.
-2. Click **Download ZIP**.
-3. Unzip the file. You'll get a folder called `dramaticPause-main`.
-4. Move that folder somewhere permanent, like your Documents folder.
-
-> **Keep the folder where it is.** The browser loads the extension straight from this folder. If you delete or move it later, the extension stops working.
-
-**Option B: Clone with Git**
-
-```bash
-git clone https://github.com/hados1109/dramaticPause.git
-```
-
-### Step 2: Load it into your browser
-
-**Google Chrome**
-
-1. Type `chrome://extensions` into the address bar and press Enter.
-2. Turn on **Developer mode** using the switch in the top-right corner.
-3. Click **Load unpacked** (top left).
-4. Select the folder from Step 1: the one that has `manifest.json` directly inside it.
-5. "Dramatic Pause for YouTube" now appears in your extensions list.
-
-**Microsoft Edge**
-
-1. Go to `edge://extensions`.
-2. Turn on **Developer mode** (in the left sidebar, or at the bottom of the page).
-3. Click **Load unpacked** and select the folder.
-
-**Brave / Opera / Vivaldi**
-
-Same steps as Chrome, using `brave://extensions`, `opera://extensions` or `vivaldi://extensions`.
-
-### Step 3: Pin it and try it
-
-1. Click the puzzle-piece icon in the toolbar and click the pin next to **Dramatic Pause**.
-2. Open any YouTube video (if a YouTube tab was already open, refresh it).
-3. Pause the video and watch the effect.
-4. Click the toolbar icon to turn the effect on or off, switch between **Cinematic** and **Anime**, or preview a style with the eye icon.
+**Tip:** Click the puzzle-piece icon in your toolbar and pin **Dramatic Pause** so it's always visible. Click its icon to turn the effect on or off, or switch between **Cinematic** and **Anime**.
 
 ---
 

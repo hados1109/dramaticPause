@@ -18,9 +18,8 @@
   </header>
 
   <div class="rule rule-ink" data-paint="box"></div>
-  <p class="label" id="styles-label" data-paint="text">Pick a pause</p>
 
-  <div class="styles" id="presets" role="radiogroup" aria-labelledby="styles-label">
+  <div class="styles" id="presets" role="radiogroup" aria-label="Pause style">
     <div class="row">
       <button type="button" role="radio" class="select" data-preset="cinematic" aria-checked="false">
         <span class="num"><span class="mark" aria-hidden="true"><i data-paint="box"></i><i data-paint="box"></i></span><span data-paint="text">01</span></span>
@@ -42,6 +41,15 @@
     </div>
     <div class="rule" data-paint="box"></div>
   </div>
+
+  <section class="update" id="update" hidden>
+    <p class="update-title"><span class="mark" aria-hidden="true"><i data-paint="box"></i><i data-paint="box"></i></span><span data-paint="text">Update available</span><span class="update-ver" id="update-ver" data-paint="text"></span></p>
+    <ol class="update-steps">
+      <li data-paint="text"><a href="https://github.com/hados1109/dramaticPause/archive/refs/heads/main.zip" target="_blank" rel="noopener" class="update-btn" data-paint="box"><span data-paint="text">Download</span></a> and unzip it.</li>
+      <li data-paint="text">Replace your old Dramatic Pause folder with the new one.</li>
+      <li data-paint="text"><button type="button" class="update-btn" id="update-reload" data-paint="box"><span data-paint="text">Reload</span></button> to finish.</li>
+    </ol>
+  </section>
 
   <footer class="footer">
     <a href="https://vinyas.me/" target="_blank" rel="noopener" data-paint="text">Made by Vinyas Pandey</a>
