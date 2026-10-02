@@ -36,7 +36,6 @@ button{font:inherit;color:inherit}
 
 .rule{height:1px;background:var(--rule);flex:none}
 .rule-ink{height:1.5px;margin-top:18px;background:var(--ink)}
-.label{margin:14px 0 2px;font:500 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
 
 .styles{display:flex;flex-direction:column;transition:opacity .2s}
 .styles[aria-disabled="true"]{opacity:.45;pointer-events:none}
