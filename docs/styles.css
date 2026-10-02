@@ -5,7 +5,7 @@
   color-scheme: light;
   --paper:#f1ede4; --paper-2:#e8e3d7; --ink:#121110; --ink-2:#34322e; --mute:#6b675f; --rule:rgba(18,17,16,.16);
   --red:#ff2a12;
-  --serif:"Bodoni Moda","Bodoni 72","Didot",Georgia,serif;
+  --serif:"Playfair Display","Bodoni 72","Didot",Georgia,serif;
   --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   --sfx:"Dela Gothic One","Hiragino Sans","Yu Gothic","Noto Sans JP",sans-serif;
   --gutter:clamp(20px,4.4vw,64px);
@@ -53,7 +53,7 @@ body.is-frozen .rec-dot{animation:none;border-radius:0;width:8px;background:line
 .hud{display:flex;align-items:center;justify-content:space-between;height:96px;font:500 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
 .hud-brand{text-decoration:none}
 /* The wordmark, small: same drawing as the one in the credits */
-.logo{display:inline-flex;align-items:baseline;white-space:nowrap;font:italic 900 30px/1 var(--serif);letter-spacing:-.04em;text-transform:none;font-variation-settings:"opsz" 96}
+.logo{display:inline-flex;align-items:baseline;white-space:nowrap;font:italic 900 30px/1 var(--serif);letter-spacing:-.04em;text-transform:none}
 .logo .beat{gap:.07em;margin:0 .05em 0 .08em}
 .logo .beat i{width:.1em;height:.42em}
 .hud-meta{display:flex;gap:10px;color:var(--mute)}
@@ -67,7 +67,7 @@ body.is-frozen .rec-dot{animation:none;border-radius:0;width:8px;background:line
 @keyframes flare{0%{opacity:.5}100%{opacity:.1}}
 
 .hero-inner{position:relative;margin-top:clamp(24px,6vh,72px)}
-.headline{max-width:12.6em;font-family:var(--serif);font-size:clamp(32px,4.7vw,74px);font-weight:400;line-height:1.04;font-variation-settings:"opsz" 96;color:var(--ink)}
+.headline{max-width:12.6em;font-family:var(--serif);font-size:clamp(32px,4.7vw,74px);font-weight:400;line-height:1.04;color:var(--ink)}
 .quiet{letter-spacing:-.028em;animation:rise .9s var(--out) .1s both}
 .headline>.beat{margin-left:.28em;vertical-align:-.02em;opacity:0}
 .hero.is-beat .headline>.beat{opacity:1;animation:blink .7s steps(1) 2}
@@ -92,10 +92,10 @@ body.is-frozen .rec-dot{animation:none;border-radius:0;width:8px;background:line
 .hero.is-landed .hanko{animation:stamp .45s var(--snap) .5s both}
 @keyframes stamp{0%{opacity:0;transform:rotate(-14deg) scale(1.8)}100%{opacity:1;transform:rotate(-6deg) scale(1)}}
 
-.hero-foot{position:relative;margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;gap:32px 48px;flex-wrap:wrap;padding-top:48px;
+.hero-foot{position:relative;margin-top:auto;display:flex;align-items:flex-start;justify-content:space-between;gap:32px 48px;flex-wrap:wrap;padding-top:48px;
   border-top:1.5px solid var(--ink);animation:rise .9s var(--out) .3s both}
 .lede{max-width:28ch;font:400 clamp(20px,1.85vw,28px)/1.22 var(--serif);letter-spacing:-.01em}
-.lede em{display:block;font-style:italic}
+.lede{display:flex;align-items:center;min-height:62px;text-align:right}
 
 @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 @keyframes blink{50%{opacity:0}}
@@ -112,7 +112,7 @@ body.is-frozen .rec-dot{animation:none;border-radius:0;width:8px;background:line
   100%{opacity:1;transform:rotate(-12deg) scale(1)}}
 
 /* ───────── Split download button ───────── */
-.cta{display:flex;flex-direction:column;align-items:flex-end;gap:14px}
+.cta{display:flex;flex-direction:column;align-items:flex-start;gap:14px}
 .split{position:relative;display:inline-flex}
 .split-main,.split-toggle{display:flex;align-items:center;justify-content:center;height:62px;margin:0;border:0;cursor:pointer;
   background:var(--ink);color:var(--paper);transition:background-color .18s,color .18s}
@@ -137,7 +137,7 @@ body.is-frozen .rec-dot{animation:none;border-radius:0;width:8px;background:line
 .split-item-text{display:flex;flex-direction:column;gap:4px}
 .split-item-label{font:600 12.5px/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase}
 .split-item-sub{font:400 12px/1.2 var(--mono);opacity:.65}
-.cta-note{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;font:500 10.5px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--mute)}
+.cta-note{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-start;font:500 10.5px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--mute)}
 
 /* ───────── Demo ───────── */
 .scene{position:relative;padding:clamp(72px,8vw,120px) var(--gutter) 0;overflow-x:clip}
@@ -255,7 +255,7 @@ body.is-frozen .rec-dot{animation:none;border-radius:0;width:8px;background:line
   background:linear-gradient(currentColor,currentColor) 0 100%/0 1px no-repeat;padding-bottom:2px;transition:background-size .3s var(--out)}
 .foot-link:hover{background-size:100% 1px}
 
-.wordmark{width:max-content;margin:0 0 0 -.03em;font:italic 900 15vw/.8 var(--serif);letter-spacing:-.05em;white-space:nowrap;font-variation-settings:"opsz" 96}
+.wordmark{width:max-content;margin:0 0 0 -.03em;font:italic 900 15vw/.8 var(--serif);letter-spacing:-.05em;white-space:nowrap}
 .wordmark .beat{margin:0 .05em 0 .08em;font-size:.66em;vertical-align:.02em}
 .fineprint{display:flex;align-items:baseline;justify-content:space-between;gap:24px;margin-top:40px;
   font:400 11px/1.5 var(--mono);color:var(--mute)}
@@ -271,7 +271,7 @@ body.is-frozen .rec-dot{animation:none;border-radius:0;width:8px;background:line
 /* ───────── Smaller screens ───────── */
 @media (max-width:1080px){
   .scene-grid{grid-template-columns:1fr}
-  .stage{order:-1;margin-bottom:8px}
+  .effects{margin-bottom:8px}
   .fx-list{display:grid;grid-template-columns:1fr 1fr;column-gap:32px}
   .still-caption{position:static;margin-top:10px;text-align:right}
   .stage .scene-credit{margin-top:18px}
