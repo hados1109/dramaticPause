@@ -244,13 +244,6 @@ body.is-frozen .rec-dot{animation:none;border-radius:0;width:8px;background:line
   font:400 11px/1.5 var(--mono);color:var(--mute)}
 .fin{font:italic 400 22px/1 var(--serif);color:var(--ink)}
 
-/* ───────── Toast ───────── */
-.toast{position:fixed;left:50%;bottom:44px;z-index:90;max-width:calc(100vw - 48px);padding:14px 18px;background:var(--ink);color:var(--paper);
-  font:400 12.5px/1.5 var(--mono);box-shadow:5px 5px 0 var(--red);pointer-events:none;opacity:0;transform:translate(-50%,12px);
-  transition:opacity .2s ease,transform .35s var(--out)}
-.toast.is-on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
-.toast a{color:var(--paper);font-weight:600;text-underline-offset:3px}
-
 /* ───────── Smaller screens ───────── */
 @media (max-width:1080px){
   .scene-grid{grid-template-columns:1fr}

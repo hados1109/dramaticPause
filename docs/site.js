@@ -11,23 +11,6 @@ const LINKS = {
 };
 const INSTALL_GUIDE = 'https://github.com/hados1109/dramaticPause#installation';
 
-/* ───────────────────────── Toast ───────────────────────── */
-const toastEl = document.getElementById('toast');
-let toastTimer = 0;
-function toast(text, link){
-  toastEl.textContent = text;
-  if (link) {
-    const a = document.createElement('a');
-    a.href = link.href; a.target = '_blank'; a.rel = 'noopener'; a.textContent = link.text;
-    toastEl.append(' ', a);
-  }
-  toastEl.classList.add('is-on');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => toastEl.classList.remove('is-on'), 5000);
-}
-toastEl.addEventListener('pointerenter', () => clearTimeout(toastTimer));
-toastEl.addEventListener('pointerleave', () => { toastTimer = setTimeout(() => toastEl.classList.remove('is-on'), 2000); });
-
 /* ───────────────────────── Download button ───────────────────────── */
 /* Names the visitor's Chromium browser; Safari and the rest see Chrome. The button links to the install guide. */
 const BROWSERS = {
