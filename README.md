@@ -77,7 +77,7 @@ Open `chrome://extensions`, click **Remove** on the Dramatic Pause card, then de
 
 ## Website
 
-`docs/` holds the landing page. Its demo runs the real effect on a looping video. To preview it:
+`docs/` holds the landing page, live at [pause.vinyas.me](https://pause.vinyas.me). Its demo runs the real effect on a looping video. To preview it locally:
 
 ```bash
 python3 -m http.server 4321 --directory docs
