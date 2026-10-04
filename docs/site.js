@@ -5,39 +5,20 @@
 (() => {
 'use strict';
 
-/* Fill these in once the builds and the store listing exist. While a link is empty, its button says "coming soon". */
+/* Fill this in once the build exists. While it is empty, the download button links to the install guide. */
 const LINKS = {
-  chromium: '',        // Chrome / Edge / Brave build
-  safari: '',          // Safari build
-  chromeWebStore: ''   // Chrome Web Store listing
+  chromium: ''         // Chrome / Edge / Brave build
 };
 const INSTALL_GUIDE = 'https://github.com/hados1109/dramaticPause#installation';
 
-/* ───────────────────────── Toast ───────────────────────── */
-const toastEl = document.getElementById('toast');
-let toastTimer = 0;
-function toast(text, link){
-  toastEl.textContent = text;
-  if (link) {
-    const a = document.createElement('a');
-    a.href = link.href; a.target = '_blank'; a.rel = 'noopener'; a.textContent = link.text;
-    toastEl.append(' ', a);
-  }
-  toastEl.classList.add('is-on');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => toastEl.classList.remove('is-on'), 5000);
-}
-toastEl.addEventListener('pointerenter', () => clearTimeout(toastTimer));
-toastEl.addEventListener('pointerleave', () => { toastTimer = setTimeout(() => toastEl.classList.remove('is-on'), 2000); });
-
 /* ───────────────────────── Download button ───────────────────────── */
+/* Names the visitor's Chromium browser; Safari and the rest see Chrome. The button links to the install guide. */
 const BROWSERS = {
-  chrome:  { family: 'chromium', name: 'Chrome',  icon: 'i-chrome' },
-  edge:    { family: 'chromium', name: 'Edge',    icon: 'i-edge' },
-  brave:   { family: 'chromium', name: 'Brave',   icon: 'i-brave' },
-  opera:   { family: 'chromium', name: 'Opera',   icon: 'i-download' },
-  vivaldi: { family: 'chromium', name: 'Vivaldi', icon: 'i-download' },
-  safari:  { family: 'safari',   name: 'Safari',  icon: 'i-safari' }
+  chrome:  { name: 'Chrome',  icon: 'i-chrome' },
+  edge:    { name: 'Edge',    icon: 'i-edge' },
+  brave:   { name: 'Brave',   icon: 'i-brave' },
+  opera:   { name: 'Opera',   icon: 'i-download' },
+  vivaldi: { name: 'Vivaldi', icon: 'i-download' }
 };
 function detectBrowser(){
   const ua = navigator.userAgent;
@@ -46,52 +27,14 @@ function detectBrowser(){
   if (/Edg(A|iOS)?\//.test(ua) || /Microsoft Edge/.test(brands)) return 'edge';
   if (/OPR\/|Opera/.test(ua) || /Opera/.test(brands)) return 'opera';
   if (/Vivaldi/.test(ua)) return 'vivaldi';
-  if (/Chrome\/|Chromium|CriOS/.test(ua) || /Chromium|Google Chrome/.test(brands)) return 'chrome';
-  if (/Safari\//.test(ua) && /Apple/.test(navigator.vendor || '')) return 'safari';
-  return 'chrome';   // Firefox and the rest: offer the Chromium build first
+  return 'chrome';
 }
 const current = BROWSERS[detectBrowser()];
-const other = current.family === 'safari'
-  ? { family: 'chromium', name: 'Chrome', icon: 'i-chrome', sub: 'Also Edge, Brave, Arc and Opera' }
-  : { family: 'safari', name: 'Safari', icon: 'i-safari', sub: 'macOS' };
-
-const split = document.getElementById('download');
 const mainBtn = document.getElementById('download-main');
-const toggleBtn = document.getElementById('download-toggle');
-const altBtn = document.getElementById('download-alt');
-const setIcon = (el, id) => el.querySelector('use').setAttribute('href', `#${id}`);
-
-setIcon(mainBtn, current.icon);
+mainBtn.href = LINKS.chromium || INSTALL_GUIDE;
+mainBtn.querySelector('use').setAttribute('href', `#${current.icon}`);
 mainBtn.querySelector('.split-label').textContent = `Download for ${current.name}`;
-setIcon(altBtn, other.icon);
-altBtn.querySelector('.split-item-label').textContent = `Download for ${other.name}`;
-altBtn.querySelector('.split-item-sub').textContent = other.sub;
 
-function download(family){
-  if (LINKS[family]) { location.href = LINKS[family]; return; }
-  if (family === 'safari') toast('The Safari version is on its way.');
-  else toast('The download is on its way. You can already install it by hand:', { href: INSTALL_GUIDE, text: 'see how on GitHub' });
-}
-function setMenu(open, focusItem){
-  split.classList.toggle('is-open', open);
-  toggleBtn.setAttribute('aria-expanded', String(open));
-  if (open && focusItem) altBtn.focus();
-}
-mainBtn.addEventListener('click', () => download(current.family));
-altBtn.addEventListener('click', () => { setMenu(false); toggleBtn.focus(); download(other.family); });
-toggleBtn.addEventListener('click', () => setMenu(!split.classList.contains('is-open')));
-toggleBtn.addEventListener('keydown', e => {
-  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); setMenu(true, true); }
-});
-split.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && split.classList.contains('is-open')) { e.preventDefault(); setMenu(false); toggleBtn.focus(); }
-});
-split.addEventListener('focusout', e => { if (!split.contains(e.relatedTarget)) setMenu(false); });
-document.addEventListener('pointerdown', e => { if (!split.contains(e.target)) setMenu(false); });
-
-const storeLink = document.getElementById('store-link');
-if (LINKS.chromeWebStore) storeLink.href = LINKS.chromeWebStore;
-else storeLink.addEventListener('click', e => { e.preventDefault(); toast('Coming soon to the Chrome Web Store.'); });
 
 /* ───────────────────────── Settings, as content.js reads them ───────────────────────── */
 const store = { enabled: true, preset: 'cinematic' };

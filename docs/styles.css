@@ -114,29 +114,12 @@ body.is-frozen .rec-dot{animation:none;border-radius:0;width:8px;background:line
 /* ───────── Split download button ───────── */
 .cta{display:flex;flex-direction:column;align-items:flex-start;gap:14px}
 .split{position:relative;display:inline-flex}
-.split-main,.split-toggle{display:flex;align-items:center;justify-content:center;height:62px;margin:0;border:0;cursor:pointer;
-  background:var(--ink);color:var(--paper);transition:background-color .18s,color .18s}
-.split-main{gap:12px;padding:0 28px 0 24px;font:600 12.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
-.split-toggle{position:relative;width:58px;padding:0}
-.split-toggle::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:1px;background:rgba(241,237,228,.22)}
-.split-main:hover,.split-toggle:hover,.split-toggle[aria-expanded="true"]{background:var(--red);color:var(--ink)}
-.split-main:hover+.split-toggle::before,.split-toggle:hover::before{background:transparent}
-.split-main:active,.split-toggle:active{transform:translateY(1px)}
+.split-main{display:flex;align-items:center;justify-content:center;gap:12px;height:62px;margin:0;padding:0 28px 0 24px;border:0;cursor:pointer;
+  background:var(--ink);color:var(--paper);text-decoration:none;font:600 12.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;
+  transition:background-color .18s,color .18s}
+.split-main:hover{background:var(--red);color:var(--ink)}
+.split-main:active{transform:translateY(1px)}
 .split-icon{width:18px;height:18px;flex:none}
-.split-toggle svg{width:20px;height:20px;transition:transform .25s var(--out)}
-.split-toggle[aria-expanded="true"] svg{transform:rotate(180deg)}
-
-.split-menu{position:absolute;top:calc(100% + 10px);right:0;min-width:100%;z-index:30;padding:6px;background:var(--paper);
-  border:1.5px solid var(--ink);box-shadow:6px 6px 0 var(--ink);text-align:left;
-  visibility:hidden;opacity:0;transform:translateY(-8px);transition:opacity .15s ease,transform .22s var(--out),visibility 0s linear .22s}
-.split.is-open .split-menu{visibility:visible;opacity:1;transform:none;transition-delay:0s}
-.split-item{display:flex;align-items:center;gap:14px;width:100%;padding:12px 14px;border:0;background:transparent;cursor:pointer;text-align:left}
-.split-item:hover,.split-item:focus-visible{background:var(--ink);color:var(--paper)}
-.split-item:focus-visible{outline:0}
-.split-item-icon{width:20px;height:20px;flex:none}
-.split-item-text{display:flex;flex-direction:column;gap:4px}
-.split-item-label{font:600 12.5px/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase}
-.split-item-sub{font:400 12px/1.2 var(--mono);opacity:.65}
 .cta-note{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-start;font:500 10.5px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--mute)}
 
 /* ───────── Demo ───────── */
@@ -260,13 +243,6 @@ body.is-frozen .rec-dot{animation:none;border-radius:0;width:8px;background:line
 .fineprint{display:flex;align-items:baseline;justify-content:space-between;gap:24px;margin-top:40px;
   font:400 11px/1.5 var(--mono);color:var(--mute)}
 .fin{font:italic 400 22px/1 var(--serif);color:var(--ink)}
-
-/* ───────── Toast ───────── */
-.toast{position:fixed;left:50%;bottom:44px;z-index:90;max-width:calc(100vw - 48px);padding:14px 18px;background:var(--ink);color:var(--paper);
-  font:400 12.5px/1.5 var(--mono);box-shadow:5px 5px 0 var(--red);pointer-events:none;opacity:0;transform:translate(-50%,12px);
-  transition:opacity .2s ease,transform .35s var(--out)}
-.toast.is-on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
-.toast a{color:var(--paper);font-weight:600;text-underline-offset:3px}
 
 /* ───────── Smaller screens ───────── */
 @media (max-width:1080px){
