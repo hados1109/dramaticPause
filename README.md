@@ -87,7 +87,8 @@ Then open http://localhost:4321. GitHub Pages can serve the site straight from t
 
 - `docs/content.js` and `docs/content.css` are copies of the extension's files. The demo player is marked up like YouTube's, so the script runs unchanged. Copy them again after changing the effect.
 - The download buttons and the Chrome Web Store link are placeholders until the builds exist. Set them in `LINKS` at the top of `docs/site.js`.
-- Demo footage: "Vibrant Shibuya Crossing in Tokyo" by Nightingale on [Pexels](https://www.pexels.com/video/vibrant-shibuya-crossing-in-tokyo-28783675/), used under the Pexels license.
+- Demo footage: Tengen vs. Gyutaro, from *Demon Slayer: Kimetsu no Yaiba*, Entertainment District Arc (ufotable).
+- The demo clip is 720p SDR, tone-mapped from an 8K HDR source: `media/tengen-av1.mp4` (AV1) for most browsers, `media/tengen.mp4` (H.264) for those without AV1. It plays only while it's on screen, and tries to start with sound; browsers usually block that until the visitor interacts, so it falls back to muted and the button under the player unmutes it.
 
 ## Known limits
 

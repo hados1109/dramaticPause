@@ -212,7 +212,25 @@ body.is-frozen .rec-dot{animation:none;border-radius:0;width:8px;background:line
   opacity:0;transform:translateY(6px);transition:opacity .6s ease,transform .8s var(--out);pointer-events:none}
 .scene-grid[data-fx="cinematic"].is-paused .still-caption{opacity:1;transform:none;transition-delay:.9s}
 
-.scene-credit{margin-top:26px;max-width:46ch;font:400 11.5px/1.6 var(--mono);color:var(--mute)}
+/* Sound toggle under the picture: the bars move while it plays with sound, and stop with the picture */
+.sound{display:inline-flex;align-items:center;gap:11px;height:40px;margin:34px 0 0;padding:0 16px 0 14px;border:1.5px solid var(--ink);background:none;cursor:pointer;
+  font:600 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink);transition:background-color .18s,color .18s}
+.sound:hover{background:var(--ink);color:var(--paper)}
+.sound:active{transform:translateY(1px)}
+.sound-bars{display:flex;align-items:flex-end;gap:2px;height:12px}
+.sound-bars i{width:3px;height:100%;background:var(--red);transform-origin:bottom;transform:scaleY(var(--h))}
+.sound-bars i:nth-child(1){--h:.5}
+.sound-bars i:nth-child(2){--h:1}
+.sound-bars i:nth-child(3){--h:.7}
+.sound-bars i:nth-child(4){--h:.85}
+.sound.is-live .sound-bars i{animation:eq .5s ease-in-out infinite alternate}
+.sound.is-live .sound-bars i:nth-child(2){animation-duration:.38s;animation-delay:-.2s}
+.sound.is-live .sound-bars i:nth-child(3){animation-duration:.62s;animation-delay:-.4s}
+.sound.is-live .sound-bars i:nth-child(4){animation-duration:.44s;animation-delay:-.1s}
+.sound.is-muted .sound-bars i{--h:.17;background:currentColor;animation:none}
+@keyframes eq{from{transform:scaleY(.2)}to{transform:scaleY(1)}}
+
+.scene-credit{margin-top:18px;max-width:46ch;font:400 11.5px/1.6 var(--mono);color:var(--mute)}
 
 /* Cursor over the picture: the dot is where the ripple will start */
 .cursor{position:fixed;left:0;top:0;z-index:75;pointer-events:none;display:none}
@@ -250,7 +268,6 @@ body.is-frozen .rec-dot{animation:none;border-radius:0;width:8px;background:line
   .effects{margin-bottom:8px}
   .fx-list{display:grid;grid-template-columns:1fr 1fr;column-gap:32px}
   .still-caption{position:static;margin-top:10px;text-align:right}
-  .stage .scene-credit{margin-top:18px}
 }
 @media (max-width:720px){
   .hud{height:76px}
@@ -263,6 +280,7 @@ body.is-frozen .rec-dot{animation:none;border-radius:0;width:8px;background:line
   .loud{font-size:22.5vw}
   .sfx-don{top:auto;bottom:-1.2em;right:6%}
   .frame::after{transform:translate(12px,12px)}
+  .sound{margin-top:26px}
   .hero-foot{flex-direction:column;align-items:stretch}
   .cta{align-items:stretch}
   .split{display:flex}

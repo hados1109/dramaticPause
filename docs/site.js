@@ -152,11 +152,34 @@ const cursor = document.getElementById('cursor');
 const cursorLabel = document.getElementById('cursor-label');
 const stylesEl = document.getElementById('dp-styles');
 const options = [...stylesEl.querySelectorAll('[data-preset]')];
+const soundBtn = document.getElementById('sound');
+const soundLabel = soundBtn.querySelector('.sound-label');
 const NAMES = { cinematic: 'Cinematic', anime: 'Anime' };
+const FPS = 24;                                      // the clip's frame rate, for the player's timecode
 
-
-const play = () => { const p = video.play(); if (p) p.catch(syncState); };
-function toggle(){ if (video.paused) play(); else video.pause(); }
+/* The clip plays only while it's on screen. `parked`: paused because it's off screen (or not reached yet), not by the
+   visitor, so the page keeps its live look. `held`: the visitor paused it, so it stays paused when they come back. */
+let parked = !CALM, held = CALM, onScreen = false;
+/* The first play asks for sound. Browsers allow that only once the visitor has interacted with the page,
+   so it usually starts muted and the button under the player turns the sound on. */
+let askedSound = false;
+function play(){
+  if (!askedSound) { askedSound = true; video.muted = false; }
+  const p = video.play();
+  if (p) p.catch(err => {
+    if (err.name === 'NotAllowedError' && !video.muted) { video.muted = true; play(); return; }   // sound not allowed yet
+    if (!parked) syncState();
+  });
+}
+function toggle(){
+  if (video.paused) { held = parked = false; play(); }
+  else { held = true; video.pause(); }
+}
+/* Scrolling away pauses it quietly: content.js never hears that pause, so no effect plays off screen */
+let quiet = false;
+player.addEventListener('pause', e => { if (quiet) { quiet = false; e.stopPropagation(); } }, true);
+function park(){ if (!video.paused) { parked = quiet = true; video.pause(); } }
+function unpark(){ if (!held && video.paused) { parked = false; play(); } }
 function takeOver(){ player.classList.add('drove'); }
 
 /* A click on the picture toggles it, like YouTube. content.js hears the same click first (it listens on the document)
@@ -169,7 +192,18 @@ stateBtn.addEventListener('click', () => { takeOver(); toggle(); });
 player.addEventListener('keydown', e => {
   if (e.target !== player || e.metaKey || e.ctrlKey || e.altKey) return;
   if (e.key === ' ' || e.key === 'k' || e.key === 'K') { e.preventDefault(); takeOver(); toggle(); }
+  if (e.key === 'm' || e.key === 'M') { e.preventDefault(); toggleSound(); }
 });
+
+/* Sound, under the picture. Its bars move while sound plays and stop with the picture. */
+function renderSound(){
+  soundBtn.classList.toggle('is-muted', video.muted);
+  soundBtn.classList.toggle('is-live', !video.paused);
+  soundLabel.textContent = video.muted ? 'Unmute' : 'Mute';
+}
+function toggleSound(){ askedSound = true; video.muted = !video.muted; }
+soundBtn.addEventListener('click', toggleSound);
+['volumechange', 'play', 'pause'].forEach(k => video.addEventListener(k, renderSound));
 
 const drawProgress = () => { if (video.duration) fill.style.transform = `scaleX(${video.currentTime / video.duration})`; };
 function syncState(){
@@ -180,7 +214,7 @@ function syncState(){
   stateText.textContent = paused ? 'Paused' : 'Playing';
   cursorLabel.textContent = paused ? 'Play' : 'Pause';
   hintEl.textContent = paused ? 'Tap to play' : 'Tap the picture to pause';
-  playerTc.textContent = timecode(video.currentTime, 30);
+  playerTc.textContent = timecode(video.currentTime, FPS);
   drawProgress();
   setFrozen(paused);
 }
@@ -195,7 +229,7 @@ function tick(now){
   if (!frozen) pageTime += dt;
   const t = timecode(pageTime, 24);
   if (t !== pageText) { pageTc.textContent = t; pageText = t; }
-  if (!video.paused) { playerTc.textContent = timecode(video.currentTime, 30); drawProgress(); }
+  if (!video.paused) { playerTc.textContent = timecode(video.currentTime, FPS); drawProgress(); }
   requestAnimationFrame(tick);
 }
 requestAnimationFrame(tick);
@@ -229,7 +263,8 @@ function choose(preset){
   if (preset === store.preset) return;
   setSettings({ preset });              // content.js clears the old effect
   renderPanel();
-  if (video.paused) play();             // ready to be paused again with the new style
+  held = false;                         // ready to be paused again with the new style
+  if (onScreen) unpark();
 }
 options.forEach(o => o.addEventListener('click', () => choose(o.dataset.preset)));
 stylesEl.addEventListener('keydown', e => {
@@ -241,7 +276,14 @@ stylesEl.addEventListener('keydown', e => {
   next.focus(); choose(next.dataset.preset);
 });
 
-/* Start playing */
+/* Play once the picture is well in view, pause once it's fully out */
 renderPanel();
-if (CALM) syncState(); else play();
+renderSound();
+if (CALM) syncState();
+if ('IntersectionObserver' in window) {
+  new IntersectionObserver(([en]) => {
+    if (en.intersectionRatio >= 0.5) { onScreen = true; unpark(); }
+    else if (!en.isIntersecting) { onScreen = false; park(); }
+  }, { threshold: [0, 0.5] }).observe(player);
+} else { onScreen = true; unpark(); }
 })();
