@@ -10,14 +10,13 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="Dramatic Pause for YouTube">
 <meta property="og:description" content="Something as simple as pausing a video can be dramatic.">
-<meta property="og:image" content="media/shibuya-poster.jpg">
+<meta property="og:image" content="media/tengen-poster.jpg">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=block">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&display=swap&text=%E3%83%89%E3%83%B3%E3%82%B4%E4%B8%80%E6%99%82%E5%81%9C%E6%AD%A2Anime%20speedlines%21">
-<link rel="preload" href="media/shibuya.mp4" as="video" type="video/mp4">
 <link rel="stylesheet" href="content.css">
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -106,22 +105,26 @@
       <div class="stage">
         <div class="frame">
           <i class="fc fc-tl"></i><i class="fc fc-tr"></i><i class="fc fc-bl"></i><i class="fc fc-br"></i>
-          <div class="player html5-video-player" id="movie_player" tabindex="0" role="group" aria-label="Demo video. Click, or press Space, to pause and play.">
-            <video class="html5-main-video" src="media/shibuya.mp4" poster="media/shibuya-poster.jpg" muted loop playsinline preload="auto" disablepictureinpicture disableremoteplayback aria-hidden="true"></video>
+          <div class="player html5-video-player" id="movie_player" tabindex="0" role="group" aria-label="Demo video. Click, or press Space, to pause and play. M mutes.">
+            <video class="html5-main-video" poster="media/tengen-poster.jpg" muted loop playsinline preload="auto" disablepictureinpicture disableremoteplayback aria-hidden="true">
+              <source src="media/tengen-av1.mp4" type='video/mp4; codecs="av01.0.05M.08, mp4a.40.2"'>
+              <source src="media/tengen.mp4" type='video/mp4; codecs="avc1.640028, mp4a.40.2"'>
+            </video>
             <div class="ph ph-top">
               <button type="button" class="ph-state" id="ph-state" aria-label="Pause"><span class="ph-dot" aria-hidden="true"><i></i><i></i></span><span class="ph-state-text" aria-hidden="true">Play</span></button>
               <span class="ph-tc" id="ph-tc" aria-hidden="true">00:00:00:00</span>
             </div>
             <div class="ph ph-bottom" aria-hidden="true">
-              <span>Shibuya, Tokyo</span>
+              <span>Tengen vs. Gyutaro</span>
               <span id="ph-effect">Cinematic</span>
             </div>
             <div class="ph-progress" aria-hidden="true"><div class="ph-fill"></div></div>
             <p class="ph-hint" aria-hidden="true">Tap the picture to pause</p>
           </div>
         </div>
+        <button type="button" class="sound is-muted" id="sound"><span class="sound-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="sound-label">Unmute</span></button>
         <p class="sfx-gogo" lang="ja" aria-hidden="true"><span>ゴ</span><span>ゴ</span><span>ゴ</span><span>ゴ</span></p>
-        <p class="scene-credit">Footage by Nightingale on Pexels. The effect is the extension's own code, running live in your browser.</p>
+        <p class="scene-credit">Footage from Demon Slayer: Kimetsu no Yaiba, Entertainment District Arc (ufotable). The effect is the extension's own code, running live in your browser.</p>
         <p class="still-caption" aria-hidden="true">…and for a moment, everything stopped.</p>
       </div>
     </div>
